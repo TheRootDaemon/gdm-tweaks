@@ -1,0 +1,18 @@
+# Nix
+result
+result-*
+
+# direnv
+.direnv
+
+# NixOS tests
+**/.nixos-test-history
+
+# Editors
+.vscode/
+.idea/
+
+# Temporary files
+*.swp
+*.swo
+*~
