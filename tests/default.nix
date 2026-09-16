@@ -1,0 +1,3 @@
+{
+  accents = import ./accents.nix;
+}
