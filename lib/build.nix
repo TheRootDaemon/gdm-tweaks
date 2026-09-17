@@ -1,6 +1,7 @@
 {
   pkgs,
   gnomeShell,
+  accentCSS,
   background,
 }:
 
@@ -66,6 +67,17 @@ for css in *.css; do
   background-size: cover;
 }
 CSS_EOF
+
+# apply custom accents when configured
+${
+  if accentCSS == null
+  then ""
+  else ''
+    cat >> "$css" << 'ACCENT_EOF'
+    ${accentCSS}
+ACCENT_EOF
+  ''
+}
 done
 
 # embed the background into the bundle
