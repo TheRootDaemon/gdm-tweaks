@@ -1,8 +1,14 @@
-name: CI
+name: Code Quality
 
 on:
   push:
+    branches:
+      - master
   pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   checks:
