@@ -22,27 +22,23 @@
       inherit system;
     };
   in {
-    packages.${system}.gdm-tweaks = import ./lib {
-      inherit pkgs;
+    # packages provided by the flake
+    packages.${system} = {
+      default = import ./lib {inherit pkgs;};
+      gdm-tweaks = self.packages.${system}.default;
+      nix-unit = nix-unit.packages.${system}.default;
     };
 
-    tests = import ./tests;
-
-    checks.${system}.default =
-      pkgs.runCommand "tests" {
-        nativeBuildInputs = [
-          nix-unit.packages.${system}.default
-        ];
-      } ''
-        export HOME="$(realpath .)"
-
-        nix-unit \
-          --eval-store "$HOME" \
-          --extra-experimental-features flakes \
-          --override-input nixpkgs ${nixpkgs} \
-          --flake ${self}#tests
-
+    # checks for validating the flake
+    checks.${system}.default = pkgs.stdenv.mkDerivation {
+      name = "tests";
+      phases = ["unpackPhase" "buildPhase"];
+      src = self;
+      nativeBuildInputs = [nix-unit.packages.${system}.default];
+      buildPhase = ''
+        nix-unit ${./tests/default.nix}
         touch $out
       '';
+    };
   };
 }
