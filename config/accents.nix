@@ -22,7 +22,7 @@ in rec {
 
   # Examples
   :::{.example}
-  ## `config.presetAccents` usage example
+  ## `presetAccents` usage example
 
   ```nix
   presetAccents
@@ -59,7 +59,7 @@ in rec {
 
   # Examples
   :::{.example}
-  ## `config.isHexColor` usage example
+  ## `isHexColor` usage example
 
   ```nix
   isHexColor "#191724"
@@ -88,7 +88,7 @@ in rec {
 
   # Examples
   :::{.example}
-  ## `config.isPresetAccent` usage example
+  ## `isPresetAccent` usage example
 
   ```nix
   isPresetAccent "purple"
@@ -120,7 +120,7 @@ in rec {
 
   # Examples
   :::{.example}
-  ## `config.resolveAccent` usage example
+  ## `resolveAccent` usage example
 
   ```nix
   resolveAccent "purple"
