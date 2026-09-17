@@ -36,7 +36,10 @@
       src = self;
       nativeBuildInputs = [nix-unit.packages.${system}.default];
       buildPhase = ''
-        nix-unit ${./tests/default.nix}
+        export HOME="$(realpath .)"
+        nix-unit \
+          --eval-store "$HOME" \
+          ./tests/default.nix
         touch $out
       '';
     };
