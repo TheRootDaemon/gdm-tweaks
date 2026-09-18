@@ -89,29 +89,73 @@ in rec {
   isValidCursorTheme = theme: packageUtils.isValidPackage theme;
 
   /**
-  Resolves the cursor configuration from the given options.
+  Checks whether the given value is a valid string.
 
-  Invalid or unset cursor sizes fall back to `defaultCursorSize`.
-  Invalid or unset cursor themes fall back to `null`.
+  A value is considered to be a valid theme name, if it is `null` or a string.
 
   # Inputs
 
-  `cursorSize`
+  `theme`
+
+  : The name of the cursor theme.
+
+  # Type
+
+  ```
+  isValidCursorThemeName :: Null | String -> Bool
+  ```
+
+  # Examples
+  :::{.example}
+  ## `isValidCursorThemeName` usage example
+
+  ```nix
+  isValidCursorThemeName "exists"
+  => true
+  isValidCursorThemeName null
+  => true
+  isValidCursorThemeName 6035
+  => false
+  ```
+  :::
+  */
+  isValidCursorThemeName = name: isNull name || builtins.isString name;
+
+  /**
+  Resolves the cursor configuration from the given options.
+
+  Invalid or unset cursor sizes fall back to `defaultCursorSize`.
+  Invalid or unset cursor names fall back to `null`.
+  Invalid or unset cursor themes fall back to `null`.
+  Unset values are preserved as `null`.
+
+  The cursor theme package is validated against the provided `pkgs` package set.
+  The package is not verified to actually provide an cursor theme.
+
+  # Inputs
+
+  `size`
 
   : Optional cursor size to use. If unset or invalid, `defaultCursorSize` is used.
 
-  `cursorTheme`
+  `name`
 
-  : Optional cursor theme to use. If unset or invalid, `null` is used.
+  : Optional cursor theme package name to use. If unset or invalid, `null` is used.
+
+  `theme`
+
+  : Optional cursor theme package to use. If unset or invalid, `null` is used.
 
   # Type
 
   ```
   resolveCursor :: {
-    cursorSize :: Null | Integer;
-    cursorTheme :: Null | String;
+    size :: Null | Integer;
+    name :: Null | String;
+    theme :: Null | String;
   } -> {
     size :: Integer;
+    name :: Null | String;
     theme :: Null | String;
   }
   ```
@@ -122,61 +166,74 @@ in rec {
 
   ```nix
   resolveCursor {
-    cursorSize = 32;
-    cursorTheme = "exists";
+    size = 32;
+    name = "exists";
+    theme = "exists";
   }
   => {
     size = 32;
+    name = "exists";
     theme = "exists";
   }
   resolveCursor {
-    cursorSize = -1;
-    cursorTheme = "does-not-exist";
+    size = -1;
+    name = 6035;
+    theme = "does-not-exist";
   }
   => {
     size = 24;
+    name = null;
     theme = null;
   }
   resolveCursor {
-    cursorTheme = "does-not-exist";
+    theme = "does-not-exist";
   }
   => {
     size = 24;
+    name = null;
     theme = null;
   }
   resolveCursor {}
   => {
     size = 24;
+    name = null;
     theme = null;
   }
   ```
   :::
   */
   resolveCursor = {
-    cursorSize ? null,
-    cursorTheme ? null,
+    size ? null,
+    name ? null,
+    theme ? null,
   }: let
     resolvedSize =
-      if cursorSize == null
+      if size == null
       then defaultCursorSize
       else let
-        isValid = isValidCursorSize cursorSize;
+        isValid = isValidCursorSize size;
       in
         if isValid
-        then cursorSize
+        then size
         else defaultCursorSize;
 
+    resolvedName =
+      if isValidCursorThemeName name
+      then name
+      else null;
+
     resolvedTheme =
-      if cursorTheme == null
+      if theme == null
       then null
       else let
-        isValid = isValidCursorTheme cursorTheme;
+        isValid = isValidCursorTheme theme;
       in
         if isValid
-        then cursorTheme
+        then theme
         else null;
   in {
     size = resolvedSize;
+    name = resolvedName;
     theme = resolvedTheme;
   };
 }

@@ -62,52 +62,130 @@ in
       expected = false;
     };
 
+    # isValidThemeName
+    testIsValidCursorThemeName_Valid = {
+      expr = cursor.isValidCursorThemeName "exists";
+      expected = true;
+    };
+
+    testIsValidCursorThemeName_Null = {
+      expr = cursor.isValidCursorThemeName null;
+      expected = true;
+    };
+
+    testIsValidCursorThemeName_EmptyString = {
+      expr = cursor.isValidCursorThemeName "";
+      expected = true;
+    };
+
+    testIsValidCursorThemeName_NotAString = {
+      expr = cursor.isValidCursorThemeName 42;
+      expected = false;
+    };
+
     # resolveCursor
     testResolveCursor_Empty = {
       expr = cursor.resolveCursor {};
       expected = {
         size = 24;
+        name = null;
         theme = null;
       };
     };
 
     testResolveCursor_Valid = {
       expr = cursor.resolveCursor {
-        cursorSize = 32;
-        cursorTheme = "bibata-cursors";
+        size = 32;
+        name = "Bibata-Modern-Classic";
+        theme = "bibata-cursors";
       };
       expected = {
         size = 32;
+        name = "Bibata-Modern-Classic";
+        theme = "bibata-cursors";
+      };
+    };
+
+    testResolveCursor_NullSize = {
+      expr = cursor.resolveCursor {
+        size = null;
+        name = "Bibata-Modern-Classic";
+        theme = "bibata-cursors";
+      };
+      expected = {
+        size = 24;
+        name = "Bibata-Modern-Classic";
         theme = "bibata-cursors";
       };
     };
 
     testResolveCursor_InvalidSizeFallsBack = {
       expr = cursor.resolveCursor {
-        cursorSize = 0;
-        cursorTheme = "bibata-cursors";
+        size = 0;
+        name = "Bibata-Modern-Classic";
+        theme = "bibata-cursors";
       };
       expected = {
         size = 24;
+        name = "Bibata-Modern-Classic";
         theme = "bibata-cursors";
       };
     };
 
     testResolveCursor_InvalidThemeFallsBack = {
       expr = cursor.resolveCursor {
-        cursorSize = 32;
-        cursorTheme = "does-not-exist";
+        size = 32;
+        theme = "does-not-exist";
       };
       expected = {
         size = 32;
+        name = null;
         theme = null;
       };
     };
 
+    testResolveCursor_InvalidThemeNameFallsBack = {
+      expr = cursor.resolveCursor {
+        size = 32;
+        name = 6035;
+        theme = "bibata-cursors";
+      };
+      expected = {
+        size = 32;
+        name = null;
+        theme = "bibata-cursors";
+      };
+    };
+
     testResolveCursor_SizeOnly = {
-      expr = cursor.resolveCursor {cursorSize = 48;};
+      expr = cursor.resolveCursor {size = 48;};
       expected = {
         size = 48;
+        name = null;
+        theme = null;
+      };
+    };
+
+    testResolveCursor_NameOnly = {
+      expr = cursor.resolveCursor {
+        name = "Bibata-Modern-Classic";
+      };
+      expected = {
+        size = 24;
+        name = "Bibata-Modern-Classic";
+        theme = null;
+      };
+    };
+
+    testResolveCursor_InvalidSizeAndNameAndTheme = {
+      expr = cursor.resolveCursor {
+        size = -1;
+        name = 6035;
+        theme = "does-not-exist";
+      };
+      expected = {
+        size = 24;
+        name = null;
         theme = null;
       };
     };
