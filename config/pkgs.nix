@@ -1,18 +1,18 @@
-{pkgs}: {
+{
   /**
-  Checks whether the given value is the name of an attribute
-  available in the provided `pkgs` package set.
+  Checks whether the given value is a valid Nix package
+  represented by a derivation.
 
   # Inputs
 
-  `pkg`
+  `package`
 
   : The name of the package.
 
   # Type
 
   ```
-  isValidPackage :: String -> Bool
+  isValidPackage :: Any -> Bool
   ```
 
   # Examples
@@ -20,13 +20,15 @@
   ## `isValidPackage` usage example
 
   ```nix
-  isValidPackage "exists"
+  isValidPackage pkgs.hello
   => true
   isValidPackage "does-not-exist"
   => false
   ```
   :::
   */
-  isValidPackage = pkg:
-    builtins.isString pkg && builtins.hasAttr pkg pkgs;
+  isValidPackage = package:
+    builtins.isAttrs package
+    && package ? type
+    && package.type == "derivation";
 }

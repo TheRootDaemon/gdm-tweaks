@@ -1,15 +1,25 @@
 let
   fixturePkgs = {
-    "adwaita-icon-theme" = {};
-    "papirus" = {};
-    "macOS" = {};
+    "adwaita-icon-theme" = {type = "derivation";};
+    "macOS" = {type = "derivation";};
+    "papirus-icon-theme" = {type = "derivation";};
   };
 
   themes = builtins.attrNames fixturePkgs;
-  icons = import ../config/icons.nix {pkgs = fixturePkgs;};
+  icons = import ../config/icons.nix;
 in
   {
     # isValidIconTheme
+    testIsValidIconTheme_Valid = {
+      expr = icons.isValidIconTheme {type = "derivation";};
+      expected = true;
+    };
+
+    testIsValidIconTheme_EmptyAttrs = {
+      expr = icons.isValidIconTheme {};
+      expected = false;
+    };
+
     testIsValidIconTheme_DoesNotExist = {
       expr = icons.isValidIconTheme "does-not-exist";
       expected = false;
@@ -63,11 +73,11 @@ in
     testResolveIcons_Valid = {
       expr = icons.resolveIcons {
         name = "Papirus";
-        theme = "papirus";
+        theme = fixturePkgs."papirus-icon-theme";
       };
       expected = {
         name = "Papirus";
-        theme = "papirus";
+        theme = fixturePkgs."papirus-icon-theme";
       };
     };
 
@@ -83,11 +93,11 @@ in
 
     testResolveIcons_ThemeOnly = {
       expr = icons.resolveIcons {
-        theme = "papirus";
+        theme = fixturePkgs."papirus-icon-theme";
       };
       expected = {
         name = null;
-        theme = "papirus";
+        theme = fixturePkgs."papirus-icon-theme";
       };
     };
 
@@ -114,11 +124,11 @@ in
     testResolveIcons_InvalidNameWithValidTheme = {
       expr = icons.resolveIcons {
         name = 6035;
-        theme = "papirus";
+        theme = fixturePkgs."papirus-icon-theme";
       };
       expected = {
         name = null;
-        theme = "papirus";
+        theme = fixturePkgs."papirus-icon-theme";
       };
     };
 
@@ -150,7 +160,7 @@ in
       p: {
         name = "testIsValidIconTheme_${p}";
         value = {
-          expr = icons.isValidIconTheme p;
+          expr = icons.isValidIconTheme fixturePkgs.${p};
           expected = true;
         };
       }

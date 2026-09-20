@@ -1,12 +1,12 @@
 let
   fixturePkgs = {
-    "adwaita-icon-theme" = {};
-    "bibata-cursors" = {};
-    "papirus-icon-theme" = {};
+    "adwaita-cursor-theme" = {type = "derivation";};
+    "bibata-cursors" = {type = "derivation";};
+    "papirus-cursor-theme" = {type = "derivation";};
   };
 
   themes = builtins.attrNames fixturePkgs;
-  cursor = import ../config/cursor.nix {pkgs = fixturePkgs;};
+  cursor = import ../config/cursor.nix;
 in
   {
     # defaultCursorSize
@@ -47,6 +47,16 @@ in
     };
 
     # isValidCursorTheme
+    testIsValidCursorTheme_Valid = {
+      expr = cursor.isValidCursorTheme {type = "derivation";};
+      expected = true;
+    };
+
+    testIsValidCursorTheme_EmptyAttr = {
+      expr = cursor.isValidCursorTheme {};
+      expected = false;
+    };
+
     testIsValidCursorTheme_DoesNotExist = {
       expr = cursor.isValidCursorTheme "does-not-exist";
       expected = false;
@@ -59,6 +69,11 @@ in
 
     testIsValidCursorTheme_NotAString = {
       expr = cursor.isValidCursorTheme 42;
+      expected = false;
+    };
+
+    testIsValidCursorTheme_Null = {
+      expr = cursor.isValidCursorTheme null;
       expected = false;
     };
 
@@ -97,12 +112,12 @@ in
       expr = cursor.resolveCursor {
         size = 32;
         name = "Bibata-Modern-Classic";
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
       expected = {
         size = 32;
         name = "Bibata-Modern-Classic";
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
     };
 
@@ -110,12 +125,12 @@ in
       expr = cursor.resolveCursor {
         size = null;
         name = "Bibata-Modern-Classic";
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
       expected = {
         size = 24;
         name = "Bibata-Modern-Classic";
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
     };
 
@@ -123,12 +138,12 @@ in
       expr = cursor.resolveCursor {
         size = 0;
         name = "Bibata-Modern-Classic";
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
       expected = {
         size = 24;
         name = "Bibata-Modern-Classic";
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
     };
 
@@ -148,12 +163,12 @@ in
       expr = cursor.resolveCursor {
         size = 32;
         name = 6035;
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
       expected = {
         size = 32;
         name = null;
-        theme = "bibata-cursors";
+        theme = fixturePkgs."bibata-cursors";
       };
     };
 
@@ -196,7 +211,7 @@ in
       p: {
         name = "testIsValidCursorTheme_${p}";
         value = {
-          expr = cursor.isValidCursorTheme p;
+          expr = cursor.isValidCursorTheme fixturePkgs.${p};
           expected = true;
         };
       }

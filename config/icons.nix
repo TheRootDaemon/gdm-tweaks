@@ -1,23 +1,23 @@
-{pkgs}: let
-  packageUtils = import ./pkgs.nix {inherit pkgs;};
+let
+  packageUtils = import ./pkgs.nix;
 in rec {
   /**
-  Checks whether the given value is the name of an attribute
-  available in the provided `pkgs` package set.
+  Checks whether the given value is a valid package
+  represented by a derivation.
 
-  This only checks whether the package exists.
-  It does not verify that the package is actually a icon theme.
+  This only checks whether the value is a derivation.
+  It does not verify that the package is actually an icon theme.
 
   # Inputs
 
   `theme`
 
-  : The name of the icon theme package.
+  : The icon theme package.
 
   # Type
 
   ```
-  isValidIconTheme :: String -> Bool
+  isValidIconTheme :: Any -> Bool
   ```
 
   # Examples
@@ -25,7 +25,7 @@ in rec {
   ## `isValidIconTheme` usage example
 
   ```nix
-  isValidIconTheme "exists"
+  isValidIconTheme { type = "derivation"; }
   => true
   isValidIconTheme "does-not-exist"
   => false
@@ -74,7 +74,7 @@ in rec {
   Invalid icon theme packages are replaced with `null`.
   Unset values are preserved as `null`.
 
-  The icon theme package is validated against the provided `pkgs` package set.
+  The icon theme package is validated as a derivation.
   The package is not verified to actually provide an icon theme.
 
   # Inputs
@@ -85,17 +85,17 @@ in rec {
 
   `theme`
 
-  : Optional icon theme to use. If unset or invalid, `null` is used.
+  : Optional icon theme package to use. If unset or invalid, `null` is used.
 
   # Type
 
   ```
   resolveIcons :: {
     name :: Null | String;
-    theme :: Null | String;
+    theme :: Null | Package;
   } -> {
     name :: Null | String;
-    theme :: Null | String;
+    theme :: Null | Package;
   }
   ```
 
@@ -106,11 +106,11 @@ in rec {
   ```nix
   resolveIcons {
     name = "exists";
-    theme = "exists";
+    theme = { type = "derivation"; };
   }
   => {
     name = "exists";
-    theme = "exists";
+    theme = { type = "derivation"; };
   }
   resolveIcons {
     name = 6035;

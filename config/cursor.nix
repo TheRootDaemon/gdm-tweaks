@@ -1,5 +1,5 @@
-{pkgs}: let
-  packageUtils = import ./pkgs.nix {inherit pkgs;};
+let
+  packageUtils = import ./pkgs.nix;
 in rec {
   /**
   Default cursor size.
@@ -56,22 +56,22 @@ in rec {
   isValidCursorSize = size: builtins.isInt size && size > 0;
 
   /**
-  Checks whether the given value is the name of an attribute
-  available in the provided `pkgs` package set.
+  Checks whether the given value is a valid package
+  represented by a derivation.
 
-  This only checks whether the package exists.
+  This only checks whether the value is a derivation.
   It does not verify that the package is actually a cursor theme.
 
   # Inputs
 
   `theme`
 
-  : The name of the cursor theme package.
+  : The cursor theme package.
 
   # Type
 
   ```
-  isValidCursorTheme :: String -> Bool
+  isValidCursorTheme :: Any -> Bool
   ```
 
   # Examples
@@ -79,7 +79,7 @@ in rec {
   ## `isValidCursorTheme` usage example
 
   ```nix
-  isValidCursorTheme "exists"
+  isValidCursorTheme { type = "derivation"; }
   => true
   isValidCursorTheme "does-not-exist"
   => false
@@ -129,8 +129,8 @@ in rec {
   Invalid or unset cursor themes fall back to `null`.
   Unset values are preserved as `null`.
 
-  The cursor theme package is validated against the provided `pkgs` package set.
-  The package is not verified to actually provide an cursor theme.
+  The cursor theme package is validated as a derivation.
+  The package is not verified to actually provide a cursor theme.
 
   # Inputs
 
@@ -152,11 +152,11 @@ in rec {
   resolveCursor :: {
     size :: Null | Integer;
     name :: Null | String;
-    theme :: Null | String;
+    theme :: Null | Package;
   } -> {
     size :: Integer;
     name :: Null | String;
-    theme :: Null | String;
+    theme :: Null | Package;
   }
   ```
 
@@ -168,12 +168,12 @@ in rec {
   resolveCursor {
     size = 32;
     name = "exists";
-    theme = "exists";
+    theme = { type = "derivation"; };
   }
   => {
     size = 32;
     name = "exists";
-    theme = "exists";
+    theme = { type = "derivation"; };
   }
   resolveCursor {
     size = -1;
