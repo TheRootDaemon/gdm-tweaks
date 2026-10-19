@@ -29,6 +29,12 @@
       nix-unit = nix-unit.packages.${system}.default;
     };
 
+    # modules provided by the flake
+    nixosModules = {
+      default = import ./module;
+      gdm-tweaks = import ./module;
+    };
+
     # checks for validating the flake
     checks.${system}.default = pkgs.stdenv.mkDerivation {
       name = "tests";

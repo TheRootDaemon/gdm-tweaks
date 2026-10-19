@@ -36,8 +36,13 @@
       else null;
   };
 
+  needsGdmTweaks = cfg.background != null || (resolvedAccent != null && resolvedAccent.type == "color");
+
   interfaceSettings =
     {}
+    // lib.optionalAttrs (resolvedAccent != null && resolvedAccent.type == "preset") {
+      "accent-color" = resolvedAccent.value;
+    }
     // lib.optionalAttrs (cfg.cursor != null && resolvedCursor.name != null) {
       "cursor-size" = lib.gvariant.mkUint32 resolvedCursor.size;
       "cursor-theme" = resolvedCursor.name;
@@ -105,6 +110,36 @@ in {
       });
       default = null;
       description = "Icon configuration for GDM.";
+    };
+  };
+
+  config = lib.mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = config.services.displayManager.gdm.enable;
+        message = "gdm-tweaks requires services.displayManager.gdm.enable to be true.";
+      }
+    ];
+
+    services.displayManager.gdm.extraPackages = lib.mkAfter (
+      lib.optionals (resolvedCursor != null && resolvedCursor.theme != null) [
+        resolvedCursor.theme
+      ]
+      ++ lib.optionals (resolvedIcons != null && resolvedIcons.theme != null) [
+        resolvedIcons.theme
+      ]
+    );
+
+    programs.dconf.enable.gdm.databases = lib.mkAfter [
+      {
+        settings."org/gnome/desktop/interface" = interfaceSettings;
+      }
+    ];
+
+    environment.etc."gdm/env.d/95-gdm-tweaks.env" = lib.mkIf needsGdmTweaks {
+      text = ''
+        GNOME_SHELL_DATADIR=${gdmTweaks}/share/gnome-shell
+      '';
     };
   };
 }
